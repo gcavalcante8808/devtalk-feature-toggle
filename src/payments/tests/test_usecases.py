@@ -49,7 +49,7 @@ def test_payment_list_without_parameters(available_payments):
 def test_payments_get_by_payment_id_when_is_available(available_payments):
     payment = available_payments[0]
     repo = mock.Mock()
-    repo.get_by_payment_id.return_value = payment
+    repo.get_payment_by_id.return_value = payment
 
     result = payments_get_by_payment_id_usecase(repo, payment_id=payment.payment_id)
 

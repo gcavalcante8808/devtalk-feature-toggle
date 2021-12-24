@@ -2,6 +2,7 @@ import falcon
 from werkzeug.serving import run_simple
 
 from orders.rest.orders import OrderResource
+from payments.rest import PaymentResource
 
 
 def create_app():
@@ -9,6 +10,9 @@ def create_app():
     app.add_route('/orders', OrderResource())
     app.add_route('/orders/{order_id:uuid()}', OrderResource())
     app.add_route('/orders/{order_id:uuid()}/status', OrderResource())
+    app.add_route('/payments/{payment_id:uuid()}', PaymentResource())
+    app.add_route('/payments', PaymentResource())
+
 
     return app
 
