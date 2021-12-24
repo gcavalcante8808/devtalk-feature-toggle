@@ -1,3 +1,5 @@
+import enum
+
 from payments.domain import PaymentStatus
 
 
@@ -11,3 +13,14 @@ class InMemoryPaymentGateway:
             return PaymentStatus.OK
 
         return PaymentStatus.ORDER_NOT_FOUND
+
+
+class PaymentGatewayImplementations(enum.Enum):
+    IN_MEMORY = InMemoryPaymentGateway
+
+
+class PaymentGatewayFactory:
+    @staticmethod
+    def make(implementation='IN_MEMORY', implementation_options=None):
+        klass = getattr(PaymentGatewayImplementations, implementation)
+        return klass.value(implementation_options)

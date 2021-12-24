@@ -9,9 +9,9 @@ from falcon import testing
 
 from app import create_app
 from payments.domain import Payment, PaymentStatus
-from payments.repositories.payment_info import InMemoryPaymentInfo
+from payments.repositories.payment_gateway import PaymentGatewayFactory
+from payments.repositories.payment_info import PaymentInfoFactory
 from payments.serializers import PaymentSerializer
-
 
 payment_info_1 = {
     "payment_id": uuid4(),
@@ -43,7 +43,8 @@ def client():
 
 @mock.patch('payments.rest.PaymentInfoFactory')
 def test_list(mocked_repository, client):
-    repository = InMemoryPaymentInfo((payment_info_1, payment_info_2))
+    repository = PaymentInfoFactory.make(implementation='IN_MEMORY',
+                                         implementation_options=(payment_info_1, payment_info_2))
     mocked_repository.make.return_value = repository
 
     response = client.simulate_get('/payments')
@@ -53,9 +54,10 @@ def test_list(mocked_repository, client):
 
 
 @mock.patch('payments.rest.PaymentInfoFactory')
-def test_get_payment_by_id_when_payment_exists(mocked_repository, client):
-    repository = InMemoryPaymentInfo((payment_info_1, payment_info_2))
-    mocked_repository.make.return_value = repository
+def test_get_payment_by_id_when_payment_exists(mocked_payment_gateway_factory, client):
+    repository = PaymentInfoFactory.make(implementation='IN_MEMORY',
+                                         implementation_options=(payment_info_1, payment_info_2))
+    mocked_payment_gateway_factory.make.return_value = repository
 
     response = client.simulate_get(f'/payments/{str(payments[0].payment_id)}')
 
@@ -63,11 +65,15 @@ def test_get_payment_by_id_when_payment_exists(mocked_repository, client):
     assert response.json == json.loads(json.dumps(payments[0], cls=PaymentSerializer))
 
 
-@mock.patch('payments.rest.InMemoryPaymentInfo')
-@mock.patch('payments.rest.InMemoryPaymentGateway')
-def test_payment_charge_user_by_payment_info(mocked_gateway_repo, mocked_payment_repo, client):
-    mocked_payment_repo().get_payment_by_id.return_value = payments[0]
-    mocked_gateway_repo().charge_customer_using_payment_info.return_value = PaymentStatus.OK
+@mock.patch('payments.rest.PaymentInfoFactory')
+@mock.patch('payments.rest.PaymentGatewayFactory')
+def test_payment_charge_user_by_payment_info(mocked_payment_gateway_factory, mocked_payment_info_factory, client):
+    payment_gateway_repo = PaymentGatewayFactory.make(implementation='IN_MEMORY',
+                                                      implementation_options=(payment_info_1, payment_info_2))
+    mocked_payment_gateway_factory.make.return_value = payment_gateway_repo
+    payment_info_repo = PaymentInfoFactory.make(implementation='IN_MEMORY',
+                                                implementation_options=(payment_info_1, payment_info_2))
+    mocked_payment_info_factory.make.return_value = payment_info_repo
 
     response = client.simulate_post(f'/payments/{str(payments[0].payment_id)}/charge')
 
