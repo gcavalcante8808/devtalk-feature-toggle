@@ -4,7 +4,7 @@ from uuid import uuid4
 import pytest
 
 from payments.domain import Payment, PaymentStatus
-from payments.repository import PaymentInMemory, InMemoryPaymentGatewayIntegration
+from payments.repository import InMemoryPaymentInfo, InMemoryPaymentGateway
 
 
 @pytest.fixture
@@ -37,7 +37,7 @@ def available_payments():
 
 
 def test_repository_list_without_parameters(available_payments):
-    repo = PaymentInMemory(available_payments)
+    repo = InMemoryPaymentInfo(available_payments)
 
     payments = [Payment.from_dict(payment) for payment in available_payments]
 
@@ -45,7 +45,7 @@ def test_repository_list_without_parameters(available_payments):
 
 
 def test_repository_list_by_payment_id(available_payments):
-    repo = PaymentInMemory(available_payments)
+    repo = InMemoryPaymentInfo(available_payments)
     payment_id = available_payments[0]['payment_id']
 
     payment = repo.get_payment_by_id(payment_id)
@@ -54,7 +54,7 @@ def test_repository_list_by_payment_id(available_payments):
 
 
 def test_repository_charge_user_by_order_id_when_it_exists(available_payments):
-    repo = InMemoryPaymentGatewayIntegration(available_payments)
+    repo = InMemoryPaymentGateway(available_payments)
     payment_info = Payment.from_dict(available_payments[0])
 
     payment_result = repo.charge_customer_using_payment_info(payment_info)
@@ -63,7 +63,7 @@ def test_repository_charge_user_by_order_id_when_it_exists(available_payments):
 
 
 def test_repository_charge_fails_when_order_doesnt_exists_doesnt_exists(available_payments):
-    repo = InMemoryPaymentGatewayIntegration()
+    repo = InMemoryPaymentGateway()
     payment_info = Payment.from_dict(available_payments[0])
 
     payment_result = repo.charge_customer_using_payment_info(payment_info)

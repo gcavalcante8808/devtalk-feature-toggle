@@ -9,7 +9,7 @@ from falcon import testing
 
 from app import create_app
 from payments.domain import Payment, PaymentStatus
-from payments.repository import PaymentInMemory
+from payments.repository import InMemoryPaymentInfo
 from payments.serializers import PaymentSerializer
 
 
@@ -41,7 +41,7 @@ def client():
     return testing.TestClient(create_app())
 
 
-@mock.patch('payments.rest.PaymentInMemory')
+@mock.patch('payments.rest.InMemoryPaymentInfo')
 def test_list(mocked_usecase, client):
     mocked_usecase().list.return_value = payments
 
@@ -51,7 +51,7 @@ def test_list(mocked_usecase, client):
     assert response.json == json.loads(json.dumps(payments, cls=PaymentSerializer))
 
 
-@mock.patch('payments.rest.PaymentInMemory')
+@mock.patch('payments.rest.InMemoryPaymentInfo')
 def test_get_payment_by_id_when_payment_exists(mocked_usecase, client):
     mocked_usecase().get_payment_by_id.return_value = payments[0]
 
@@ -61,8 +61,8 @@ def test_get_payment_by_id_when_payment_exists(mocked_usecase, client):
     assert response.json == json.loads(json.dumps(payments[0], cls=PaymentSerializer))
 
 
-@mock.patch('payments.rest.PaymentInMemory')
-@mock.patch('payments.rest.InMemoryPaymentGatewayIntegration')
+@mock.patch('payments.rest.InMemoryPaymentInfo')
+@mock.patch('payments.rest.InMemoryPaymentGateway')
 def test_payment_charge_user_by_payment_info(mocked_gateway_repo, mocked_payment_repo, client):
     mocked_payment_repo().get_payment_by_id.return_value = payments[0]
     mocked_gateway_repo().charge_customer_using_payment_info.return_value = PaymentStatus.OK

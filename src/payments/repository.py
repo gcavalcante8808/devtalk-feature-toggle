@@ -1,7 +1,7 @@
 from payments.domain import Payment, PaymentStatus
 
 
-class PaymentInMemory:
+class InMemoryPaymentInfo:
     def __init__(self, data=None):
         self.data = data if data else set()
 
@@ -13,7 +13,7 @@ class PaymentInMemory:
         return [Payment.from_dict(i) for i in self.data]
 
 
-class InMemoryPaymentGatewayIntegration:
+class InMemoryPaymentGateway:
     def __init__(self, data=None):
         self.data = data if data else set()
 
