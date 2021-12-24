@@ -2,7 +2,7 @@ import datetime
 from decimal import Decimal
 from uuid import uuid4
 
-from payments.domain.entities import PaymentStatus, Payment
+from payments.domain import PaymentStatus, Payment
 
 
 def test_payment_from_dict():
@@ -28,6 +28,7 @@ def test_payment_from_dict():
     assert payment.user_id == user_id
     assert payment.value == Decimal(576.99)
     assert payment.payment_id == payment_id
+
 
 def test_payment_to_dict():
     payment_id = uuid4()
