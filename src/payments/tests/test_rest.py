@@ -13,7 +13,7 @@ from payments.repository import PaymentInMemory
 from payments.serializers import PaymentSerializer
 
 
-payment_info = {
+payment_info_1 = {
     "payment_id": uuid4(),
     "user_id": uuid4(),
     "order_id": uuid4(),
@@ -22,7 +22,18 @@ payment_info = {
     "value": Decimal(576.99),
     "raw_response": {}
 }
-payments = [Payment.from_dict(payment_info)]
+
+payment_info_2 = {
+    "payment_id": uuid4(),
+    "user_id": uuid4(),
+    "order_id": uuid4(),
+    "status": PaymentStatus.WAITING_FOR_PAYMENT,
+    "timestamp": datetime.datetime.now().timestamp(),
+    "value": Decimal(999.99),
+    "raw_response": {}
+}
+
+payments = [Payment.from_dict(payment_info_1), Payment.from_dict(payment_info_2)]
 
 
 @pytest.fixture
@@ -48,3 +59,15 @@ def test_get_payment_by_id_when_payment_exists(mocked_usecase, client):
 
     assert response.status_code == 200
     assert response.json == json.loads(json.dumps(payments[0], cls=PaymentSerializer))
+
+
+@mock.patch('payments.rest.PaymentInMemory')
+@mock.patch('payments.rest.InMemoryPaymentGatewayIntegration')
+def test_payment_charge_user_by_payment_info(mocked_gateway_repo, mocked_payment_repo, client):
+    mocked_payment_repo().get_payment_by_id.return_value = payments[0]
+    mocked_gateway_repo().charge_customer_using_payment_info.return_value = PaymentStatus.OK
+
+    response = client.simulate_post(f'/payments/{str(payments[0].payment_id)}/charge')
+
+    assert response.status_code == 200
+    assert response.json == {"status": PaymentStatus.OK.name}

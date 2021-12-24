@@ -17,8 +17,8 @@ class InMemoryPaymentGatewayIntegration:
     def __init__(self, data=None):
         self.data = data if data else set()
 
-    def charge_user_by_order_id(self, order_id):
-        payment = [entry for entry in self.data if order_id == entry['order_id']]
+    def charge_customer_using_payment_info(self, payment):
+        payment = [entry for entry in self.data if payment.payment_id == entry['payment_id']]
         if payment:
             return PaymentStatus.OK
 

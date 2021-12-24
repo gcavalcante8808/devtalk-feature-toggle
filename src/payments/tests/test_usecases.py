@@ -6,7 +6,7 @@ import pytest
 
 from payments.domain import Payment, PaymentStatus
 from payments.usecases import payments_list_usecase, payments_get_by_payment_id_usecase, \
-    payments_charge_customer_using_payment_info
+    payments_charge_customer_using_payment_info_usecase
 
 
 @pytest.fixture
@@ -64,6 +64,6 @@ def test_payment_charge_user_by_order_id(available_payments):
     repo = mock.Mock()
     repo.charge_customer_using_payment_info.return_value = payment
 
-    result = payments_charge_customer_using_payment_info(repo, payment)
+    result = payments_charge_customer_using_payment_info_usecase(repo, payment)
 
     assert result == payment
