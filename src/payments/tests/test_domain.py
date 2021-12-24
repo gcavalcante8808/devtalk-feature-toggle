@@ -2,7 +2,7 @@ import datetime
 from decimal import Decimal
 from uuid import uuid4
 
-from payments.domain.entities import PaymentStatus, Payment
+from payments.domain import PaymentStatus, Payment
 
 
 def test_payment_from_dict():

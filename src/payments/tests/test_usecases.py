@@ -4,8 +4,8 @@ from uuid import uuid4
 
 import pytest
 
-from payments.domain.entities import Payment, PaymentStatus
-from payments.domain.usecases import payments_list_usecase
+from payments.domain import Payment, PaymentStatus
+from payments.usecases import payments_list_usecase, payments_get_by_payment_id_usecase
 
 
 @pytest.fixture
@@ -44,3 +44,13 @@ def test_payment_list_without_parameters(available_payments):
     result = payments_list_usecase(repo)
 
     assert result == available_payments
+
+
+def test_payments_get_by_payment_id_when_is_available(available_payments):
+    payment = available_payments[0]
+    repo = mock.Mock()
+    repo.get_by_payment_id.return_value = payment
+
+    result = payments_get_by_payment_id_usecase(repo, payment_id=payment.payment_id)
+
+    assert result == payment
