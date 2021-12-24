@@ -2,7 +2,8 @@ import json
 
 import falcon
 
-from payments.repository import InMemoryPaymentInfo, InMemoryPaymentGateway
+from payments.repositories.payment_gateway import InMemoryPaymentGateway
+from payments.repositories.payment_info import InMemoryPaymentInfo
 from payments.serializers import PaymentSerializer
 from payments.usecases import payments_list_usecase, payments_get_by_payment_id_usecase, \
     payments_charge_customer_using_payment_info_usecase

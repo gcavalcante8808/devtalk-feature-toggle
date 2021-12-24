@@ -9,7 +9,7 @@ from falcon import testing
 
 from app import create_app
 from payments.domain import Payment, PaymentStatus
-from payments.repository import InMemoryPaymentInfo
+from payments.repositories.payment_info import InMemoryPaymentInfo
 from payments.serializers import PaymentSerializer
 
 

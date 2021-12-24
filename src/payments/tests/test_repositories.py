@@ -4,7 +4,8 @@ from uuid import uuid4
 import pytest
 
 from payments.domain import Payment, PaymentStatus
-from payments.repository import InMemoryPaymentInfo, InMemoryPaymentGateway
+from payments.repositories.payment_gateway import InMemoryPaymentGateway
+from payments.repositories.payment_info import InMemoryPaymentInfo
 
 
 @pytest.fixture
