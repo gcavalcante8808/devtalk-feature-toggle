@@ -29,6 +29,7 @@ def test_payment_from_dict():
     assert payment.value == Decimal(576.99)
     assert payment.payment_id == payment_id
 
+
 def test_payment_to_dict():
     payment_id = uuid4()
     order_id = uuid4()
