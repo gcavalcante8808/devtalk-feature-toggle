@@ -1,4 +1,4 @@
-from payments.domain import Payment
+from payments.domain import Payment, PaymentStatus
 
 
 class PaymentInMemory:
@@ -11,3 +11,15 @@ class PaymentInMemory:
 
     def list(self) -> list[Payment]:
         return [Payment.from_dict(i) for i in self.data]
+
+
+class InMemoryPaymentGatewayIntegration:
+    def __init__(self, data=None):
+        self.data = data if data else set()
+
+    def charge_user_by_order_id(self, order_id):
+        payment = [entry for entry in self.data if order_id == entry['order_id']]
+        if payment:
+            return PaymentStatus.OK
+
+        return PaymentStatus.ORDER_NOT_FOUND

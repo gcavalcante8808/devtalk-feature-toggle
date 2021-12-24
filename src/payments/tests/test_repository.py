@@ -4,7 +4,7 @@ from uuid import uuid4
 import pytest
 
 from payments.domain import Payment, PaymentStatus
-from payments.repository import PaymentInMemory
+from payments.repository import PaymentInMemory, InMemoryPaymentGatewayIntegration
 
 
 @pytest.fixture
@@ -51,3 +51,21 @@ def test_repository_list_by_payment_id(available_payments):
     payment = repo.get_payment_by_id(payment_id)
 
     assert payment == Payment.from_dict(available_payments[0])
+
+
+def test_repository_charge_user_by_order_id_when_it_exists(available_payments):
+    repo = InMemoryPaymentGatewayIntegration(available_payments)
+    order_id = available_payments[0]['order_id']
+
+    payment_result = repo.charge_user_by_order_id(order_id)
+
+    assert payment_result == PaymentStatus.OK
+
+
+def test_repository_charge_fails_when_order_doesnt_exists_doesnt_exists(available_payments):
+    repo = InMemoryPaymentGatewayIntegration()
+    order_id = uuid4()
+
+    payment_result = repo.charge_user_by_order_id(order_id)
+
+    assert payment_result == PaymentStatus.ORDER_NOT_FOUND

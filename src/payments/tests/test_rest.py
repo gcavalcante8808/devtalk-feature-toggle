@@ -36,16 +36,6 @@ def test_list(mocked_usecase, client):
 
     response = client.simulate_get('/payments')
 
-    breakpoint()
-    assert response.status_code == 200
-    assert response.json == json.loads(json.dumps(payments, cls=PaymentSerializer))
-
-@mock.patch('payments.rest.PaymentInMemory')
-def test_list(mocked_usecase, client):
-    mocked_usecase().list.return_value = payments
-
-    response = client.simulate_get('/payments')
-
     assert response.status_code == 200
     assert response.json == json.loads(json.dumps(payments, cls=PaymentSerializer))
 
