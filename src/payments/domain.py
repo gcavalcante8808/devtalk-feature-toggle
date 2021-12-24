@@ -7,6 +7,7 @@ from decimal import Decimal
 
 class PaymentStatus(enum.IntEnum):
     OK = 0
+    WAITING_FOR_PAYMENT = 0
     FAILED_ON_GATEWAY = 1
     PENDING_ON_GATEWAY = 2
     COMMUNICATION_ERROR = 3

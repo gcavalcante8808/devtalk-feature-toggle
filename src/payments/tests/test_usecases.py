@@ -5,7 +5,8 @@ from uuid import uuid4
 import pytest
 
 from payments.domain import Payment, PaymentStatus
-from payments.usecases import payments_list_usecase, payments_get_by_payment_id_usecase
+from payments.usecases import payments_list_usecase, payments_get_by_payment_id_usecase, \
+    payments_charge_customer_using_payment_info
 
 
 @pytest.fixture
@@ -52,5 +53,17 @@ def test_payments_get_by_payment_id_when_is_available(available_payments):
     repo.get_payment_by_id.return_value = payment
 
     result = payments_get_by_payment_id_usecase(repo, payment_id=payment.payment_id)
+
+    assert result == payment
+
+
+def test_payment_charge_user_by_order_id(available_payments):
+    payment = available_payments[0]
+    payment.status = PaymentStatus.WAITING_FOR_PAYMENT
+    payment.raw_response = {'result': 'error', 'reason': 'pix API unavailable'}
+    repo = mock.Mock()
+    repo.charge_customer_using_payment_info.return_value = payment
+
+    result = payments_charge_customer_using_payment_info(repo, payment)
 
     assert result == payment
