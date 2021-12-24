@@ -3,7 +3,7 @@ import json
 import falcon
 
 from payments.repositories.payment_gateway import InMemoryPaymentGateway
-from payments.repositories.payment_info import InMemoryPaymentInfo
+from payments.repositories.payment_info import InMemoryPaymentInfo, PaymentInfoFactory
 from payments.serializers import PaymentSerializer
 from payments.usecases import payments_list_usecase, payments_get_by_payment_id_usecase, \
     payments_charge_customer_using_payment_info_usecase
@@ -11,11 +11,12 @@ from payments.usecases import payments_list_usecase, payments_get_by_payment_id_
 
 class PaymentResource:
     def on_get(self, req, resp, payment_id=None):
+        payment_repository = PaymentInfoFactory.make()
 
         if not payment_id:
-            result = payments_list_usecase(InMemoryPaymentInfo())
+            result = payments_list_usecase(payment_repository)
         else:
-            result = payments_get_by_payment_id_usecase(InMemoryPaymentInfo(), payment_id)
+            result = payments_get_by_payment_id_usecase(payment_repository, payment_id)
 
         resp.text = json.dumps(result, cls=PaymentSerializer)
         resp.status = falcon.HTTP_200

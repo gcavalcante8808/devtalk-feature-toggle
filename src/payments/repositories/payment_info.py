@@ -1,3 +1,5 @@
+import enum
+
 from payments.domain import Payment
 
 
@@ -11,3 +13,14 @@ class InMemoryPaymentInfo:
 
     def list(self) -> list[Payment]:
         return [Payment.from_dict(i) for i in self.data]
+
+
+class PaymentInfoImplementations(enum.Enum):
+    IN_MEMORY = InMemoryPaymentInfo
+
+
+class PaymentInfoFactory:
+    @staticmethod
+    def make(implementation='IN_MEMORY', implementation_options=None):
+        klass = getattr(PaymentInfoImplementations, implementation)
+        return klass.value(implementation_options)

@@ -41,9 +41,10 @@ def client():
     return testing.TestClient(create_app())
 
 
-@mock.patch('payments.rest.InMemoryPaymentInfo')
-def test_list(mocked_usecase, client):
-    mocked_usecase().list.return_value = payments
+@mock.patch('payments.rest.PaymentInfoFactory')
+def test_list(mocked_repository, client):
+    repository = InMemoryPaymentInfo((payment_info_1, payment_info_2))
+    mocked_repository.make.return_value = repository
 
     response = client.simulate_get('/payments')
 
@@ -51,9 +52,10 @@ def test_list(mocked_usecase, client):
     assert response.json == json.loads(json.dumps(payments, cls=PaymentSerializer))
 
 
-@mock.patch('payments.rest.InMemoryPaymentInfo')
-def test_get_payment_by_id_when_payment_exists(mocked_usecase, client):
-    mocked_usecase().get_payment_by_id.return_value = payments[0]
+@mock.patch('payments.rest.PaymentInfoFactory')
+def test_get_payment_by_id_when_payment_exists(mocked_repository, client):
+    repository = InMemoryPaymentInfo((payment_info_1, payment_info_2))
+    mocked_repository.make.return_value = repository
 
     response = client.simulate_get(f'/payments/{str(payments[0].payment_id)}')
 
